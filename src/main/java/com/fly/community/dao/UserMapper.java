@@ -1,5 +1,6 @@
 package com.fly.community.dao;
 
+import com.fly.community.entity.LoginTicket;
 import com.fly.community.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 
