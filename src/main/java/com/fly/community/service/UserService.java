@@ -173,4 +173,8 @@ public class UserService {
         User user = userMapper.selectById(id);
         userMapper.updatePassword(id, CommunityUtil.md5(newPwd + user.getSalt()));
     }
+
+    public User findUserByName(String toName) {
+        return userMapper.selectByName(toName);
+    }
 }

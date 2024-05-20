@@ -36,18 +36,20 @@ public class Constants {
     }
 
     /**
-     * 全局属性
-     */
-    public static final class Global {
-        public static final Long TREE_NULL_NODE = 0L;
-    }
-
-    /**
      * 过期时间(长/短)
      */
     public static final class Time {
         public static final Integer LONG_EXPIRE_TIME = 3600 * 24 * 90;
         public static final Integer SHORT_EXPIRE_TIME = 3600 * 12;
+    }
+
+
+    /**
+     * 评论类型（1：对帖子评论、2：对评论回复，即楼中楼）
+     */
+    public static final class CommentEntityType {
+        public static final Integer COMMENT_TYPE = 1;
+        public static final Integer REPLY_TYPE = 2;
     }
 
 
