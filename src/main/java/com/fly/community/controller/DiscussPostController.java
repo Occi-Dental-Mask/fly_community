@@ -7,6 +7,7 @@ import com.fly.community.entity.Page;
 import com.fly.community.entity.User;
 import com.fly.community.service.CommentService;
 import com.fly.community.service.DiscussPostService;
+import com.fly.community.service.LikeService;
 import com.fly.community.service.UserService;
 import com.fly.community.util.CommunityUtil;
 import com.fly.community.util.HostHolder;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.util.*;
+
+import static com.fly.community.commons.Constants.EntityType.ENTITY_TYPE_COMMENT;
 
 /**
  * @description:
@@ -41,6 +44,9 @@ public class DiscussPostController {
     @Resource
     private HostHolder hostHolder;
 
+    @Resource
+    private LikeService likeService;
+
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @ResponseBody
     public String addDiscussPost(String title, String content) {
@@ -62,6 +68,15 @@ public class DiscussPostController {
         model.addAttribute("post", discussPost);
         User user = userService.findUserById(discussPost.getUserId());
         model.addAttribute("user", user);
+
+        // 点赞数量
+        long likeCount = likeService.findEntityLikes(Constants.EntityType.ENTITY_TYPE_POST, discussPostId);
+        model.addAttribute("likeCount", likeCount);
+        // 点赞状态
+        int likeStatus = hostHolder.getUser() == null ? 0 :
+                likeService.alreadyLiked(hostHolder.getUser().getId(), Constants.EntityType.ENTITY_TYPE_POST, discussPostId);
+        model.addAttribute("likeStatus", likeStatus);
+
         // set page info
         page.setPath("/discuss/detail/" + discussPostId);
         page.setRows(discussPost.getCommentCount());
@@ -73,6 +88,13 @@ public class DiscussPostController {
             Map<String, Object> commentVO = new HashMap<>();
             commentVO.put("comment", comment);
             commentVO.put("user", userService.findUserById(comment.getUserId()));
+            // 点赞数量
+            likeCount = likeService.findEntityLikes(ENTITY_TYPE_COMMENT, comment.getId());
+            commentVO.put("likeCount", likeCount);
+            // 点赞状态
+            likeStatus = hostHolder.getUser() == null ? 0 :
+                    likeService.alreadyLiked(hostHolder.getUser().getId(), ENTITY_TYPE_COMMENT, comment.getId());
+            commentVO.put("likeStatus", likeStatus);
             commentVOList.add(commentVO);
             // for every comment there are its replies
             List<Comment> replyList = commentService.findCommentsByEntity(Constants.CommentEntityType.REPLY_TYPE, comment.getId(), 0, Integer.MAX_VALUE);
@@ -85,6 +107,13 @@ public class DiscussPostController {
                 User target = reply.getTargetId() == 0 ? null : userService.findUserById(reply.getTargetId());
                 // to whom reply
                 replyVO.put("target", target);
+                // 点赞数量
+                likeCount = likeService.findEntityLikes(ENTITY_TYPE_COMMENT, reply.getId());
+                replyVO.put("likeCount", likeCount);
+                // 点赞状态
+                likeStatus = hostHolder.getUser() == null ? 0 :
+                        likeService.alreadyLiked(hostHolder.getUser().getId(), ENTITY_TYPE_COMMENT, reply.getId());
+                replyVO.put("likeStatus", likeStatus);
                 replyVOList.add(replyVO);
             }
             commentVO.put("replies", replyVOList);

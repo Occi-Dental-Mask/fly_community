@@ -34,6 +34,10 @@ public class MessageController {
     @Resource
     private HostHolder hostHolder;
 
+//    @RequestMapping(value = "/letter/profile", method = RequestMethod.GET)
+//    public String getProfilePage() {
+//        return "/site/letter-detail";
+//    }
     @RequestMapping(value = "/letter/list", method = RequestMethod.GET)
     public String getMailList(Model model, Page page) {
         User user = hostHolder.getUser();
