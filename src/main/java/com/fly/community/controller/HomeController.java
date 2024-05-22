@@ -4,26 +4,32 @@ import com.fly.community.entity.DiscussPost;
 import com.fly.community.entity.Page;
 import com.fly.community.entity.User;
 import com.fly.community.service.DiscussPostService;
+import com.fly.community.service.LikeService;
 import com.fly.community.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.fly.community.commons.Constants.EntityType.ENTITY_TYPE_POST;
+
 @Controller
 public class HomeController {
 
-    @Autowired
+    @Resource
     private DiscussPostService discussPostService;
 
-    @Autowired
+    @Resource
     private UserService userService;
+
+    @Resource
+    private LikeService likeService;
 
     @RequestMapping(path = "/index", method = RequestMethod.GET)
     public String getIndexPage(Model model, Page page) {
@@ -40,6 +46,9 @@ public class HomeController {
                 map.put("post", post);
                 User user = userService.findUserById(post.getUserId());
                 map.put("user", user);
+
+                long likeCount = likeService.findEntityLikes(ENTITY_TYPE_POST, post.getId());
+                map.put("likeCount", likeCount);
                 discussPosts.add(map);
             }
         }
