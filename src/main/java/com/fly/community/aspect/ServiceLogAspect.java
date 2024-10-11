@@ -32,6 +32,9 @@ public class ServiceLogAspect {
     public void before(JoinPoint joinPoint) {
         logger.debug("----------方法执行前----------");
         ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            return;
+        }
         HttpServletRequest request = attributes.getRequest();
         String ip = request.getRemoteHost();
         String name = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();

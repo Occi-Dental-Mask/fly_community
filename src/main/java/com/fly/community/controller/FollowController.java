@@ -1,7 +1,10 @@
 package com.fly.community.controller;
 
+import com.fly.community.entity.Event;
 import com.fly.community.entity.Page;
 import com.fly.community.entity.User;
+import com.fly.community.event.EventProducer;
+import com.fly.community.event.NewsConstants;
 import com.fly.community.service.FollowService;
 import com.fly.community.service.UserService;
 import com.fly.community.util.CommunityUtil;
@@ -20,7 +23,7 @@ import java.util.Map;
 import static com.fly.community.commons.Constants.EntityType.ENTITY_TYPE_USER;
 
 @Controller
-public class FollowController {
+public class FollowController implements NewsConstants {
 
     @Autowired
     private FollowService followService;
@@ -30,14 +33,22 @@ public class FollowController {
 
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private EventProducer eventProducer;
     @RequestMapping(path = "/follow", method = RequestMethod.POST)
     @ResponseBody
     public String follow(int entityType, int entityId) {
         User user = hostHolder.getUser();
 
         followService.follow(user.getId(), entityType, entityId);
-
+        // 触发关注事件
+        Event event = new Event()
+                .setTopic(TOPIC_FOLLOW)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(entityType)
+                .setEntityId(entityId)
+                .setEntityUserId(entityId);
+        eventProducer.fireEvent(event);
         return CommunityUtil.getJSONString(0, "已关注!");
     }
 
